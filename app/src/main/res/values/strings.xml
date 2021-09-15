@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">MyGongMo</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Fragment1</string>
+    <string name="hello_blank_fragment2">Fragment2</string>
+    <string name="hello_blank_fragment3">Fragment3</string>
+</resources>

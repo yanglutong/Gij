@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="color_b">#BEBEBE</color>
+    <color name="colorPrimary2">#008577</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+    <color name="colorBai">#FFFFFF</color>
+    <color name="colorBg">#F4F6FD</color>
+    <color name="colorJigTextColor">#4080FF</color>
+    <color name="colorJigTextColorCancel">#999999</color>
+    <color name="colorJigG">#FF022A8F</color>
+    <color name="colorJigBlack">#FF000000</color>
+    <color name="colorJigHui">#EEEDF6</color>
+    <color name="colorMyr">#E5E7ED</color>
+    <color name="colorH">#FC0119</color>
+    <color name="teal">#00796B</color>
+    <color name="brown">#8D6E63</color>
+    <color name="blue">#2196F3</color>
+    <color name="grey">#607D8B</color>
+    <color name="orange">#FFA726</color>
+    <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
+    <color name="deviceBlue">#4080FF</color>
+    <color name="text_gray">#9B9C9C</color>
+    <color name="color_3853e8">#0072E3</color>
+
+</resources>
