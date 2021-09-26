@@ -49,6 +49,7 @@ import com.example.linechart.Bean;
 import com.example.linechart.ChartView;
 import com.example.linechart.ChartView2;
 import com.example.utils.DtUtils;
+import com.example.utils.MyUtils;
 import com.example.utils.ToastUtils;
 import com.github.mikephil.charting.charts.LineChart;
 
@@ -88,32 +89,64 @@ public class GijFragment2 extends Fragment implements View.OnClickListener {
             if (msg.what == 1) {
                 Log.i("ylteeee", "handleMessage: ");
                 if (kaList != null && kaList.size() > 0) {//有卡的数据
+                    setNullData();//每次数据都是空的
                     Log.e("handler2", "handleMessage1: " + MainActivity.getPagerPosition() + "   " + cellBeanListCurrent.size());
                     setLiShiData();//只要有数据历史记录就会被一直初始化
                     if(MainActivity.getPagerPosition()==0){//当滑动为界面1
                     }else if(MainActivity.getPagerPosition()==1){//界面2
-                        if (kaList.get(kaList.size() - 1).equals("5G")) {//当前如果有5G数据
-                            if(isAdded()){
-                                setNr(5);//设置5G
-                                Log.e("测试数据", "界面2: 5G");
-                            }
-                        }if(cellBeanListCurrent.size()>1){//代表卡2界面4G数据
-                            if(isAdded()){
-                                Log.e("测试数据", "界面2: 4G");
-                                setLte2(1, cellBeanList2, 4);
-                            }
-                        }else if (kaList.get(kaList.size()-1).equals("2G") ){
-                            if(isAdded()){
-                                setGsm(2);
-                                Log.e("测试数据", "界面2: 2G");
-                            }
-                        }else {
-                            Log.e("测试数据", "界面2: setNullData");
-                            setNullData();
+                        if(MyUtils.readSimState(getActivity())==1){//当前只有一张卡
+                                if(listNR.size()>1){
+                                    if(isAdded()){
+                                        setNr(5);//设置5G
+                                        Log.e("测试数据", "单卡界面2: 5G");
+                                    }
+                                    return;
+                                }
+                                if(cellBeanListCurrent.size()>0){
+                                    if(isAdded()){
+                                        Log.e("测试数据", "单卡界面2: 4G");
+                                        setLte2(0, cellBeanList2, 4);
+                                    }
+                                    return;
+                                }
+                                if(listGsm.size()>1){
+                                    if(isAdded()){
+                                        setGsm(2);
+                                        Log.e("测试数据", "单卡界面2: 2G");
+                                    }
+                                    return;
+                                }
+                        }else if(MyUtils.readSimState(getActivity())==2){
+                                    if(kaList.get(kaList.size()-1).equals("4G")){//有4G数据
+                                            if(cellBeanListCurrent.size()>1){
+                                                if(isAdded()){
+                                                    Log.e("测试数据", "界面2: 4G");
+                                                    setLte2(1, cellBeanList2, 4);
+                                                }
+                                            }else if(cellBeanListCurrent.size()>0){
+                                                if(isAdded()){
+                                                    Log.e("测试数据", "界面2: 4G");
+                                                    setLte2(0, cellBeanList2, 4);
+                                                }
+                                            }
+
+                                    }else if(kaList.get(kaList.size()-1).equals("5G")){//没有4G数据情况下
+                                        if(isAdded()){
+                                            setNr(5);//设置5G
+                                            Log.e("测试数据", "界面2: 5G");
+                                        }
+                                    }else if(kaList.get(kaList.size()-1).equals("2G")){
+                                        if(isAdded()){
+                                            setGsm(2);
+                                            Log.e("测试数据", "界面2: 2G");
+                                        }
+                                    }else{
+                                        setNullData();
+                                    }
                         }
                     }
                 }else{
-                    setNullData();
+                    setNullData();//每次都先值为空
                 }
             }
         }
@@ -347,180 +380,6 @@ public class GijFragment2 extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void setLte(int i, ArrayList<CellBean> cellBeanList,int type) {
-        if(i==0){//代表当前为第1个界面小区的数据
-            if(cellBeanListCurrent.size()>0){//设置页面的服务小区和信号强度
-                //将服务小区的状态改变
-                tvKey_pci.setText("PCI");
-                tvKey_arfcn.setText("EARFCN");
-                tvKey_ci.setText("ECI");
-                tvKey_tac.setText("TAC");
-                tvKey_band.setText("BAND");
-                tvLTE_LTE.setText("LTE");
-
-
-                if (cellBeanListCurrent.get(i).getPlmn().equals("46000")) {
-                    tv_plmn.setText(cellBeanListCurrent.get(i).getPlmn() + "(中国移动)");
-                } else if (cellBeanListCurrent.get(i).getPlmn().equals("46011")) {
-                    tv_plmn.setText(cellBeanListCurrent.get(i).getPlmn() + "(中国电信)");
-                } else if (cellBeanListCurrent.get(i).getPlmn().equals("46001")) {
-                    tv_plmn.setText(cellBeanListCurrent.get(i).getPlmn() + "(中国联通)");
-                } else {
-                    tv_plmn.setText(cellBeanListCurrent.get(i).getPlmn());
-                }
-                if(cellBeanListCurrent.size()>0){
-                    if(cellBeanListCurrent.get(i).getTac()!=null){
-                        tv_tac.setText(cellBeanListCurrent.get(i).getTac());
-
-                    }
-                }
-                if(cellBeanListCurrent.size()>0){
-                    if(cellBeanListCurrent.get(i).getEci()!=null){
-                        tv_eci.setText(DtUtils.getECI(cellBeanListCurrent.get(i).getEci()));
-                    }
-                }
-                if(cellBeanListCurrent.size()>0){
-                    if(cellBeanListCurrent.get(i).getPci()!=null){
-                        tv_pci.setText(cellBeanListCurrent.get(i).getPci());
-                    }
-                }
-                if(cellBeanListCurrent.size()>0){
-                    if(cellBeanListCurrent.get(i).getEarfcn()!=null){
-                        if (cellBeanListCurrent.get(i).getEarfcn().equals("0")) {
-                            tv_EARFCN.setText("");
-                        } else {
-                            tv_EARFCN.setText(cellBeanListCurrent.get(i).getEarfcn());
-                        }
-                    }
-                }
-
-                if(cellBeanListCurrent.size()>0){
-                    int band = 0;
-                    if (cellBeanListCurrent.get(i).getBand() != null && !TextUtils.isEmpty(cellBeanListCurrent.get(i).getBand())) {
-                        band = Integer.parseInt(cellBeanListCurrent.get(i).getBand());
-                    }
-                    if (band == 0) {
-                        tv_BAND.setText("");
-                    } else {
-                        tv_BAND.setText(getBands(band));
-                    }
-                }
-
-                //设置信号强度
-                Linear_RSRP.setVisibility(View.VISIBLE);
-                Linear_RSRQ.setVisibility(View.VISIBLE);
-
-                RSSI.setText("SS\nRSSI");
-                RSSP.setText("RSRP");
-                RSSQ.setText("RSRQ");
-                tv_rssi.setText(cellBeanListCurrent.get(0).getRssi());
-                tv_RSRP.setText(cellBeanListCurrent.get(0).getRsrp());
-                tv_RSRQ.setText(cellBeanListCurrent.get(0).getRsrq());
-
-                //曲线图
-                setLteQx(i);
-
-                //邻小区和历史记录
-                if(!isCell)
-                    setLiShi(type,i);
-                else
-                if (cellBeanList.size() > 1) {
-                    adapter = new My4GAdapter(4, cellBeanList, getActivity());
-                } else {
-                    adapter = new My4GAdapter(4, listItem, getActivity());
-                }
-                recycler.setAdapter(adapter);
-            }else{
-                setNullData();
-            }
-        }else if(i==1){//代表当前为第二个界面小区的4G数据
-            if(cellBeanListCurrent.size()>1){//设置页面的服务小区和信号强度
-                //将服务小区的状态改变
-                tvKey_pci.setText("PCI");
-                tvKey_arfcn.setText("EARFCN");
-                tvKey_ci.setText("ECI");
-                tvKey_tac.setText("TAC");
-                tvKey_band.setText("BAND");
-                tvLTE_LTE.setText("LTE");
-                Linear_SINR.setVisibility(View.GONE);
-
-
-                if (cellBeanListCurrent.get(i).getPlmn().equals("46000")) {
-                    tv_plmn.setText(cellBeanListCurrent.get(i).getPlmn() + "(中国移动)");
-                } else if (cellBeanListCurrent.get(i).getPlmn().equals("46011")) {
-                    tv_plmn.setText(cellBeanListCurrent.get(i).getPlmn() + "(中国电信)");
-                } else if (cellBeanListCurrent.get(i).getPlmn().equals("46001")) {
-                    tv_plmn.setText(cellBeanListCurrent.get(i).getPlmn() + "(中国联通)");
-                } else {
-                    tv_plmn.setText(cellBeanListCurrent.get(i).getPlmn());
-                }
-                if(cellBeanListCurrent.size()>1){
-                    if(cellBeanListCurrent.get(i).getTac()!=null){
-                        tv_tac.setText(cellBeanListCurrent.get(i).getTac());
-
-                    }
-                }
-                if(cellBeanListCurrent.size()>1){
-                    if(cellBeanListCurrent.get(i).getEci()!=null){
-                        tv_eci.setText(DtUtils.getECI(cellBeanListCurrent.get(i).getEci()));
-                    }
-                }
-                if(cellBeanListCurrent.size()>1){
-                    if(cellBeanListCurrent.get(i).getPci()!=null){
-                        tv_pci.setText(cellBeanListCurrent.get(i).getPci());
-                    }
-                }
-                if(cellBeanListCurrent.size()>1){
-                    if(cellBeanListCurrent.get(i).getEarfcn()!=null){
-                        if (cellBeanListCurrent.get(i).getEarfcn().equals("0")) {
-                            tv_EARFCN.setText("");
-                        } else {
-                            tv_EARFCN.setText(cellBeanListCurrent.get(i).getEarfcn());
-                        }
-                    }
-                }
-
-                if(cellBeanListCurrent.size()>1){
-                    int band = 0;
-                    if (cellBeanListCurrent.get(i).getBand() != null && !TextUtils.isEmpty(cellBeanListCurrent.get(i).getBand())) {
-                        band = Integer.parseInt(cellBeanListCurrent.get(i).getBand());
-                    }
-                    if (band == 0) {
-                        tv_BAND.setText("");
-                    } else {
-                        tv_BAND.setText(getBands(band));
-                    }
-                }
-
-                //设置信号强度
-                Linear_RSRP.setVisibility(View.VISIBLE);
-                Linear_RSRQ.setVisibility(View.VISIBLE);
-
-                RSSI.setText("RSSI");
-                RSSP.setText("RSRP");
-                RSSQ.setText("RSRQ");
-                tv_rssi.setText(cellBeanListCurrent.get(1).getRssi());
-                tv_RSRP.setText(cellBeanListCurrent.get(1).getRsrp());
-                tv_RSRQ.setText(cellBeanListCurrent.get(1).getRsrq());
-
-                //曲线图
-                setLteQx(i);
-
-                //邻小区和历史记录
-                if(!isCell)
-                    setLiShi(type,i);
-                else
-                if (cellBeanList.size() > 1) {
-                    adapter = new My4GAdapter(4, cellBeanList, getActivity());
-                } else {
-                    adapter = new My4GAdapter(4, listItem, getActivity());
-                }
-                recycler.setAdapter(adapter);
-            }else{
-                setNullData();
-            }
-        }
-    }
 private void setLte2(int i, ArrayList<CellBean> cellBeanList,int type) {//i 代表当前为第i个界面小区的数据
             if(cellBeanListCurrent.size()>i){//设置页面的服务小区和信号强度
                 //将服务小区的状态改变
@@ -740,8 +599,8 @@ private void setLte2(int i, ArrayList<CellBean> cellBeanList,int type) {//i 代�
             tv_RSRQ.setTextColor(getResources().getColor(R.color.colorJigBlack));
 
 
-            ChartView2.num_max = -110;
-            ChartView2.num_min = -130;
+            ChartView2.num_max = -30;
+            ChartView2.num_min = -160;
             list0.remove(0);
             list0.add(new Bean("",Float.parseFloat(listNR.get(1).getRsrp())));
             if (list0 != null && list0.size() > 0) {
@@ -757,7 +616,7 @@ private void setLte2(int i, ArrayList<CellBean> cellBeanList,int type) {//i 代�
             tv_RSRQ.setTextColor(getResources().getColor(R.color.colorJigBlack));
 
             ChartView2.num_max = -10;
-            ChartView2.num_min = -20;
+            ChartView2.num_min = -60;
             list1.remove(0);
             list1.add(new Bean("",Float.parseFloat(listNR.get(1).getRsrq())));
             if (list1 != null && list1.size() > 0) {
@@ -772,8 +631,8 @@ private void setLte2(int i, ArrayList<CellBean> cellBeanList,int type) {//i 代�
             tv_RSRP.setTextColor(getResources().getColor(R.color.colorJigBlack));
             tv_rssi .setTextColor(getResources().getColor(R.color.colorJigBlack));
 
-            ChartView2.num_max = -1;
-            ChartView2.num_min = -20;
+            ChartView2.num_max = 0;
+            ChartView2.num_min = -30;
             initChart(context);
             list2.remove(0);
             list2.add(new Bean("",Float.parseFloat(listNR.get(1).getSsSinr())));
@@ -888,13 +747,13 @@ private void setLte2(int i, ArrayList<CellBean> cellBeanList,int type) {//i 代�
                 recycler.setAdapter(adapter);
             }
 
-            //曲线图设置为空
-            ChartView2.num_max = -90;
-            ChartView2.num_min = -110;
-            ChartView2.initChart(context);
-            if (list11 != null && list11.size() > 0) {
-                ChartView2.showLineChart(list11, "日期", context.getResources().getColor(R.color.color_3853e8));
-            }
+//            //曲线图设置为空
+//            ChartView2.num_max = -90;
+//            ChartView2.num_min = -110;
+//            ChartView2.initChart(context);
+//            if (list11 != null && list11.size() > 0) {
+//                ChartView2.showLineChart(list11, "日期", context.getResources().getColor(R.color.color_3853e8));
+//            }
         }
     }
 
@@ -1103,10 +962,10 @@ private void setLte2(int i, ArrayList<CellBean> cellBeanList,int type) {//i 代�
                     bean.setArfcn(nr.getNrarfcn()+"");
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    bean.setRsrp(nrStrength.getSsRsrp()+"");
+                    bean.setRsrp("-"+nrStrength.getSsRsrp()+"");
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    bean.setRsrq(nrStrength.getSsRsrq()+"");
+                    bean.setRsrq("-"+nrStrength.getSsRsrq()+"");
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     bean.setSsSinr(nrStrength.getSsSinr()+"");
@@ -1135,7 +994,7 @@ private void setLte2(int i, ArrayList<CellBean> cellBeanList,int type) {//i 代�
                 gsm1.setCellShow(true);
 
 
-                Log.i("ylt2G", "getBitErrorRate: "+strength.getBitErrorRate());
+//                Log.i("ylt2G", "getBitErrorRate: "+strength.getBitErrorRate());
                 Log.i("ylt2G", "getAsuLevel: "+strength.getAsuLevel());
                 Log.i("ylt2G", "getDbm: "+strength.getDbm());
                 Log.i("ylt2G", "getLevel: "+strength.getLevel());

@@ -6,6 +6,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.telephony.SubscriptionManager;
+import android.util.Log;
 import android.view.View;
 
 import androidx.core.app.ActivityCompat;
@@ -102,5 +104,30 @@ public class MyUtils {
         decorView.setSystemUiVisibility(option);
         mainActivity.getWindow().setStatusBarColor(Color.TRANSPARENT
         );
+    }
+
+    /**获取当前卡槽数量
+     * @description
+     * @param
+     * @return
+     * @author lutong
+     * @time 2021/9/26 16:14
+     */
+
+    public static int  readSimState(Context context){
+        int  s=0;
+        SubscriptionManager mSubscriptionManager = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
+            mSubscriptionManager = SubscriptionManager.from(context);
+        }
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            }else{
+                s = mSubscriptionManager.getActiveSubscriptionInfoCount();//获取当前sim卡数量
+                Log.i("ylt", "onCreate: "+s);
+            }
+
+        }
+        return s;
     }
 }

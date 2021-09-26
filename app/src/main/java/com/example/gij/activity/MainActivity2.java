@@ -1,20 +1,26 @@
 package com.example.gij.activity;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.telephony.SubscriptionManager;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 
 import com.example.gij.R;
 
 public class MainActivity2 extends Activity {
 
-//    private TextView tv_cell;
+    //    private TextView tv_cell;
 //    private BatteryReceiver batteryReceiver;
     private Handler handler = new Handler() {
         @Override
@@ -32,13 +38,32 @@ public class MainActivity2 extends Activity {
             handler.sendMessage(message);
             handler.postDelayed(this, 1000);
         }
-    };;
+    };
+    ;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
-
+        SubscriptionManager mSubscriptionManager = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
+            mSubscriptionManager = SubscriptionManager.from(this);
+        }
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            int simNumberCard = mSubscriptionManager.getActiveSubscriptionInfoCount();//获取当前sim卡数量
+            Log.i("ylt", "onCreate: "+simNumberCard);
+        }
 
 //        handler.post(runnable);
 //
@@ -77,7 +102,26 @@ public class MainActivity2 extends Activity {
 //        }
 //
 //    }
+public void readSIMCard() {
+    TelephonyManager manager = (TelephonyManager) this
 
+            .getSystemService(TELEPHONY_SERVICE);// 取得相关系统服务
+
+    String imsi = manager.getSubscriberId(); // 取出IMSI
+
+    System.out.println("取出IMSI" + imsi);
+
+    if (imsi == null || imsi.length() <= 0) {
+        System.out.println("请确认sim卡是否插入或者sim卡暂时不可用！");
+
+//APIFailSimBuyJNI();
+
+    } else {
+        System.out.println("有SIM卡");
+
+    }
+
+}
     @Override
     protected void onDestroy() {
         super.onDestroy();
